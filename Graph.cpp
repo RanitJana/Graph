@@ -249,6 +249,42 @@ void dijkstraAlgo(int src, int V, vector<vector<int>> adj[])
     cout << endl;
 }
 
+void bellmanFordAlgo(int src, int V, vector<vector<int>> adj[])
+{
+    vector<vector<int>> edges;
+    vector<int> dist(V, 1e8);
+    dist[src] = 0;
+    for (int i = 0; i < V; i++)
+    {
+        for (auto it : adj[i])
+        {
+            edges.push_back({i, it[0], it[1]});
+        }
+    }
+
+    for (int i = 0; i < V - 1; i++)
+    {
+        for (auto it : edges)
+        {
+            int u = it[0];
+            int v = it[1];
+            int wt = it[2];
+            if (dist[u] != 1e8 && dist[u] + wt < dist[v])
+            {
+                dist[v] = dist[u] + wt;
+            }
+        }
+    }
+
+    for (int i = 0; i < V; i++)
+    {
+        if (dist[i] == 1e8)
+            dist[i] = -1;
+        cout << dist[i] << " ";
+    }
+    cout << endl;
+}
+
 int main()
 {
     /*int E, V;
@@ -296,5 +332,6 @@ int main()
         adj[v].push_back({u, wt});
     }
     dijkstraAlgo(0, V, adj);
+    bellmanFordAlgo(0, V, adj);
     return 0;
 }
