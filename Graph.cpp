@@ -213,6 +213,42 @@ void topoSortKhanAlgo(int V, vector<int> adj[])
     cout << endl;
 }
 
+void dijkstraAlgo(int src, int V, vector<vector<int>> adj[])
+{
+
+    vector<int> dist(V, 1e8);
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq; // distance , current node
+    dist[src] = 0;                                                                      // source to source is zero cost
+    pq.push({0, src});
+    while (!pq.empty())
+    {
+        int dis = pq.top().first;
+        int node = pq.top().second;
+
+        pq.pop();
+
+        for (auto it : adj[node])
+        {
+            int adjNode = it[0];
+            int wt = it[1];
+
+            if (dis + wt < dist[adjNode])
+            {
+                dist[adjNode] = dis + wt;
+                pq.push({dist[adjNode], adjNode});
+            }
+        }
+    }
+
+    for (int i = 0; i < V; i++)
+    {
+        if (dist[i] == 1e8)
+            dist[i] = -1;
+        cout << dist[i] << " ";
+    }
+    cout << endl;
+}
+
 int main()
 {
     /*int E, V;
@@ -236,16 +272,29 @@ int main()
     cout << isCyclePresentBfs(V, adj) << " " << isCyclePresentDfs(V, adj) << " " << isBipartite(V, adj);
     */
 
+    /*int V, E;
+     cin >> V >> E;
+     vector<int> adj[V];
+     for (int i = 0; i < E; i++)
+     {
+         int u, v;
+         cin >> u >> v;
+         adj[u].push_back(v);
+     }
+     topoSortDfs(V, adj);
+     topoSortKhanAlgo(V, adj);
+     */
+
     int V, E;
     cin >> V >> E;
-    vector<int> adj[V];
+    vector<vector<int>> adj[V];
     for (int i = 0; i < E; i++)
     {
-        int u, v;
-        cin >> u >> v;
-        adj[u].push_back(v);
+        int u, v, wt;
+        cin >> u >> v >> wt;
+        adj[u].push_back({v, wt});
+        adj[v].push_back({u, wt});
     }
-    topoSortDfs(V, adj);
-    topoSortKhanAlgo(V, adj);
+    dijkstraAlgo(0, V, adj);
     return 0;
 }
