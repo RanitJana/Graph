@@ -322,6 +322,47 @@ void floydWarshall(int V, vector<vector<int>> adj[]) // 0based and assuming ther
     }
 }
 
+void primAlgo(int V, vector<vector<int>> adj[])
+{
+    vector<bool> vis(V, false);
+    vector<pair<int, pair<int, int>>> mst;
+    priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> pq;
+    // weight,node,parent
+    pq.push({0, {0, -1}});
+    while (pq.size())
+    {
+        int node = pq.top().second.first;
+        int weight = pq.top().first;
+        int parent = pq.top().second.second;
+        pq.pop();
+
+        if (vis[node] == true)
+            continue;
+        if (parent != -1)
+        {
+            mst.push_back({parent, {node, weight}});
+        }
+        vis[node] = true;
+        for (auto it : adj[node])
+        {
+            int wt = it[1], adjNode = it[0];
+            if (!vis[adjNode])
+            {
+                pq.push({wt, {adjNode, node}});
+            }
+        }
+    }
+
+    for (auto it : mst)
+    {
+        int parent = it.first;
+        int node = it.second.first;
+        int weight = it.second.second;
+
+        cout << "( " << parent << " " << node << " " << weight << " )" << endl;
+    }
+}
+
 int main()
 {
     /*int E, V;
@@ -366,11 +407,13 @@ int main()
         int u, v, wt;
         cin >> u >> v >> wt;
         adj[u].push_back({v, wt});
-        //  adj[v].push_back({u, wt});
+        adj[v].push_back({u, wt});
     }
     dijkstraAlgo(0, V, adj);
     bellmanFordAlgo(0, V, adj);
     cout << endl;
     floydWarshall(V, adj);
+    cout << endl;
+    primAlgo(V, adj);
     return 0;
 }
