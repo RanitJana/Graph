@@ -149,6 +149,7 @@ bool isCyclePresentDfs(int V, vector<int> adj[]) // 1based
     }
     return false;
 }
+
 bool isBipartite(int V, vector<int> adj[]) // 1 based
 {
     int color[V + 1];
@@ -363,6 +364,91 @@ void primAlgo(int V, vector<vector<int>> adj[])
     }
 }
 
+class DisjointSet
+{
+    vector<int> rank, size; // use only one of these vector
+    vector<int> parent;
+
+public:
+    DisjointSet(int n)
+    {
+        rank.resize(n + 1);
+        size.resize(n + 1, 1);
+        for (int i = 0; i <= n; i++)
+        {
+            parent.push_back(i);
+        }
+    }
+    int findUltimteParent(int node)
+    {
+        if (parent[node] == node)
+            return node;
+        return parent[node] = findUltimteParent(parent[node]);
+    }
+    void unionByRank(int u, int v)
+    {
+        int ulp_u = findUltimteParent(u);
+        int ulp_v = findUltimteParent(v);
+        if (ulp_u == ulp_v)
+            return;
+        if (rank[ulp_u] > rank[ulp_v])
+        {
+            parent[ulp_v] = ulp_u;
+        }
+        else if (rank[ulp_v] > rank[ulp_u])
+        {
+            parent[ulp_u] = ulp_v;
+        }
+        else
+        {
+            rank[ulp_u]++;
+            parent[ulp_v] = ulp_u;
+        }
+    }
+    void unionBySize(int u, int v)
+    {
+        int ulp_u = findUltimteParent(u);
+        int ulp_v = findUltimteParent(v);
+        if (ulp_u == ulp_v)
+            return;
+        if (size[ulp_u] > size[ulp_v])
+        {
+            size[ulp_u] += size[ulp_v];
+            parent[ulp_v] = ulp_u;
+        }
+        else
+        {
+            size[ulp_v] += size[ulp_u];
+            parent[ulp_u] = ulp_v;
+        }
+    }
+};
+
+void kruskalAlgo(int V, vector<vector<int>> adj[])
+{
+    vector<vector<int>> edges; // weight,parent,node
+    for (int i = 0; i < V; i++)
+    {
+        for (auto it : adj[i])
+        {
+            edges.push_back({it[1], it[0], i});
+        }
+    }
+
+    sort(edges.begin(), edges.end());
+
+    DisjointSet ds(V);
+
+    for (int i = 0; i < edges.size(); i++)
+    {
+        if (ds.findUltimteParent(edges[i][2]) == ds.findUltimteParent(edges[i][1]))
+            continue;
+        ds.unionByRank(edges[i][1], edges[i][2]);
+
+        cout << "( " << edges[i][1] << " " << edges[i][2] << " " << edges[i][0] << " )" << endl;
+    }
+}
+
 int main()
 {
     /*int E, V;
@@ -415,5 +501,7 @@ int main()
     floydWarshall(V, adj);
     cout << endl;
     primAlgo(V, adj);
+    cout << endl;
+    kruskalAlgo(V, adj);
     return 0;
 }
