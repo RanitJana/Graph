@@ -213,7 +213,7 @@ void topoSortKhanAlgo(int V, vector<int> adj[])
     cout << endl;
 }
 
-void dijkstraAlgo(int src, int V, vector<vector<int>> adj[])
+void dijkstraAlgo(int src, int V, vector<vector<int>> adj[]) // 0based
 {
 
     vector<int> dist(V, 1e8);
@@ -249,7 +249,7 @@ void dijkstraAlgo(int src, int V, vector<vector<int>> adj[])
     cout << endl;
 }
 
-void bellmanFordAlgo(int src, int V, vector<vector<int>> adj[])
+void bellmanFordAlgo(int src, int V, vector<vector<int>> adj[]) // 0based
 {
     vector<vector<int>> edges;
     vector<int> dist(V, 1e8);
@@ -283,6 +283,43 @@ void bellmanFordAlgo(int src, int V, vector<vector<int>> adj[])
         cout << dist[i] << " ";
     }
     cout << endl;
+}
+
+void floydWarshall(int V, vector<vector<int>> adj[]) // 0based and assuming there is no -ve edge weight
+{
+
+    vector<vector<int>> matrix(V, vector<int>(V, 1e8));
+
+    for (int i = 0; i < V; i++)
+    {
+        for (auto it : adj[i])
+        {
+            matrix[i][it[0]] = it[1];
+        }
+        matrix[i][i] = 0;
+    }
+
+    for (int k = 0; k < V; k++)
+    {
+        for (int i = 0; i < V; i++)
+        {
+            for (int j = 0; j < V; j++)
+            {
+                matrix[i][j] = min(matrix[i][j], matrix[i][k] + matrix[k][j]);
+            }
+        }
+    }
+
+    for (int i = 0; i < V; i++)
+    {
+        for (int j = 0; j < V; j++)
+        {
+            if (matrix[i][j] == 1e8)
+                matrix[i][j] = -1;
+            cout << matrix[i][j] << " ";
+        }
+        cout << endl;
+    }
 }
 
 int main()
@@ -329,9 +366,11 @@ int main()
         int u, v, wt;
         cin >> u >> v >> wt;
         adj[u].push_back({v, wt});
-        adj[v].push_back({u, wt});
+        //  adj[v].push_back({u, wt});
     }
     dijkstraAlgo(0, V, adj);
     bellmanFordAlgo(0, V, adj);
+    cout << endl;
+    floydWarshall(V, adj);
     return 0;
 }
