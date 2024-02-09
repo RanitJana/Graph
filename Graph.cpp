@@ -83,6 +83,16 @@ namespace functions
         }
         s.push(node);
     }
+
+    void kosarajuDFS(int node, vector<bool> &vis, vector<int> adj[])
+    {
+        vis[node] = true;
+        for (auto it : adj[node])
+        {
+            if (!vis[it])
+                kosarajuDFS(it, vis, adj);
+        }
+    }
 }
 
 void bfs(int V, vector<int> adj[]) // 1based
@@ -449,6 +459,39 @@ void kruskalAlgo(int V, vector<vector<int>> adj[])
     }
 }
 
+int kosarajuAlgo(int V, vector<int> adj[])
+{
+    stack<int> s;
+    vector<bool> vis(V, false);
+    for (int i = 0; i < V; i++)
+    {
+        if (!vis[i])
+            functions::findTopo(i, adj, vis, s);
+    }
+    vector<int> revAdj[V];
+    for (int i = 0; i < V; i++)
+    {
+        for (auto it : adj[i])
+        {
+            revAdj[it].push_back(i);
+        }
+        vis[i] = false;
+    }
+    int ans = 0;
+    while (!s.empty())
+    {
+        int node = s.top();
+        s.pop();
+
+        if (!vis[node])
+        {
+            functions::kosarajuDFS(node, vis, revAdj);
+            ans++;
+        }
+    }
+    return ans;
+}
+
 int main()
 {
     /*int E, V;
@@ -485,23 +528,34 @@ int main()
      topoSortKhanAlgo(V, adj);
      */
 
+    /*  int V, E;
+     cin >> V >> E;
+     vector<vector<int>> adj[V];
+     for (int i = 0; i < E; i++)
+     {
+         int u, v, wt;
+         cin >> u >> v >> wt;
+         adj[u].push_back({v, wt});
+         adj[v].push_back({u, wt});
+     }
+     dijkstraAlgo(0, V, adj);
+     bellmanFordAlgo(0, V, adj);
+     cout << endl;
+     floydWarshall(V, adj);
+     cout << endl;
+     primAlgo(V, adj);
+     cout << endl;
+     kruskalAlgo(V, adj);
+     */
     int V, E;
     cin >> V >> E;
-    vector<vector<int>> adj[V];
+    vector<int> adj[V];
     for (int i = 0; i < E; i++)
     {
-        int u, v, wt;
-        cin >> u >> v >> wt;
-        adj[u].push_back({v, wt});
-        adj[v].push_back({u, wt});
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
     }
-    dijkstraAlgo(0, V, adj);
-    bellmanFordAlgo(0, V, adj);
-    cout << endl;
-    floydWarshall(V, adj);
-    cout << endl;
-    primAlgo(V, adj);
-    cout << endl;
-    kruskalAlgo(V, adj);
+    cout << kosarajuAlgo(V, adj) << endl;
     return 0;
 }
